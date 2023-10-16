@@ -1,32 +1,22 @@
 node {
-    def customImage = docker.image('node:lts-buster-slim').using('-p 3000:3000')
-
-    try {
-        stage('Build') {
+    docker.image('node:lts-buster-slim').inside('-p 3000:3000')
+        {
+        stage('Checkout') {
             checkout scm
-            customImage.inside {
+        }
+        stage('Build') {
                 sh 'npm install'
-            }
         }
-
         stage('Test') {
-            customImage.inside {
-                sh './jenkins/scripts/test.sh'
-            }
+            sh './jenkins/script/test.sh''
         }
-
         stage('Manual Approval') {
-            input message: 'Lanjut ke tahap Deploy?'
+            input message : 'Lanjutkan ke tahap Deploy ? (Click "Proceed" to continue)'
         }
-
         stage('Deploy') {
-            customImage.inside {
-                sh './jenkins/scripts/deliver.sh'
-                sleep(time: 1, unit: 'MINUTES')
-                sh './jenkins/scripts/kill.sh'
-            }
+            sh './jenkins/scripts/deliver.sh'
+            sleep 60
+            sh './jenkins/scripts/kill.sh'
         }
-    } finally {
-        customImage.dismount()
-    }
+        }
 }
