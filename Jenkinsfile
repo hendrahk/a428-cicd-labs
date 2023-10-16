@@ -8,7 +8,7 @@ node {
                 sh 'npm install'
         }
         stage('Test') {
-            sh './jenkins/script/test.sh''
+            sh './jenkins/script/test.sh'
         }
         stage('Manual Approval') {
             input message : 'Lanjutkan ke tahap Deploy ? (Click "Proceed" to continue)'
